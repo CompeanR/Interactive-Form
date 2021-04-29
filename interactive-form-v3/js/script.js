@@ -1,3 +1,4 @@
+//FORM SECTION
 const form = document.querySelector('form')
 //BASIC INFO SECTION
 const userName = document.querySelector('#name');
@@ -7,11 +8,13 @@ const color = document.querySelector('#color');
 const jobRole = document.querySelector('#title');
 const otherJobRole = document.querySelector('#other-job-role');
 
-// REGISTER FOR ACTIVITIES SECTION
+//REGISTER FOR ACTIVITIES SECTION
 const registerForActivities = document.querySelector('#activities');
 const paragraphVar = document.querySelector('#activities-cost');
-let languageTotal = 0;
 const activitiesBox = document.querySelector('#activities-box');
+const buttons = activitiesBox.querySelectorAll('input');
+let totalCost = 0;
+let languageTotal = 0;
 
 //PAYMENT INFO SECTION
 const paymentMethod = document.querySelector('#payment');
@@ -20,11 +23,10 @@ const creditCard = document.querySelector('#credit-card');
 const paypal = document.querySelector('#paypal');
 const bitcoin = document.querySelector('#bitcoin');
 const zipCode = document.querySelector('#zip');
-const ccv = document.querySelector('#cvv');
-
+const cvv = document.querySelector('#cvv');
 
 userName.focus();
-otherJobRole.style.display = 'none'
+otherJobRole.style.display = 'none';
 
 jobRole.addEventListener('change', (e) => {
     if (e.target.value === 'other') {
@@ -34,7 +36,7 @@ jobRole.addEventListener('change', (e) => {
     };
 });
 
-color.disabled = true
+color.disabled = true;
 
 design.addEventListener('change', (e) => {
     color.disabled = false;
@@ -51,9 +53,7 @@ design.addEventListener('change', (e) => {
             e.target.setAttribute('selected', false);
         };
     };
-})
-
-let totalCost = 0;
+});
 
 registerForActivities.addEventListener('change', (e) => {
     const dataCost = +e.target.getAttribute('data-cost');
@@ -63,9 +63,9 @@ registerForActivities.addEventListener('change', (e) => {
         totalCost += dataCost;
     } else {
         totalCost -= dataCost;
+        e.target.parentElement.classList.remove('focus')
     };
 
-    console.log(totalCost)
     paragraphVar.innerHTML = `Total: $${totalCost}`;
 });
 
@@ -110,8 +110,10 @@ const validationFail = (element) => {
     element.parentElement.lastElementChild.style.display = 'block';
 };
 
-function nameValidator() {
-    const testName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(userName.value)
+function basicInfoValidator() {
+    const testName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(userName.value);
+    const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
+    const validLanguage = languageTotal > 0;
 
     if (testName) {
         validationPass(userName);
@@ -119,66 +121,70 @@ function nameValidator() {
         validationFail(userName);
     };
 
-    return testName;
-};
-
-function emailValidator() {
-    const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value)
-
     if (testEmail) {
         validationPass(emailAddress);
     } else {
         validationFail(emailAddress);
     };
 
-    return testEmail;
-};
-
-function registerForActivitiesValidator() {
-    const validLanguage = languageTotal > 0;
-
-    return validLanguage;
+    if (testName && testEmail && validLanguage) {
+        return true;
+    } else {
+        return false;
+    };
 };
 
 function creditCardValidator() {
+    if (paymentMethod.value === 'credit-card') {
+        const testCreditCard = /^\d{13,16}$/.test(cardNumber.value);
+        const testZipCode = /^\d{5}$/.test(zipCode.value);
+        const testCvv = /^\d{3}$/.test(cvv.value);
     
-    const testCreditCard = /d{13}|\d{16}/.test(cardNumber.value)
-    const testZipCode = /\d{5}/.test(zipCode.value);
-    const testCcv = /d{3}/.test(ccv.value);
+        if (testCreditCard) {
+            validationPass(cardNumber);
+        } else {
+            validationFail(cardNumber)
+        };
 
-    if (testCreditCard) {
-        validationPass(cardNumber);
-        
-    } else {
-        validationFail(cardNumber);
-        
+        if (testZipCode) {
+            validationPass(zipCode);
+        } else {
+            validationFail(zipCode)
+        };
+
+        if (testCvv) {
+            validationPass(cvv);
+        } else {
+            validationFail(cvv)
+        };
+
+        if (testCreditCard && testZipCode && testCvv) {
+            return true
+        } else {
+            return false
+        };
     };
+};
 
-    return testCreditCard;
+for (let i = 0; i < buttons.length; i++) {
+
+    buttons[i].addEventListener('focus', (e) => {
+        e.target.parentElement.className = 'focus'
+    });
+
+    buttons[i].addEventListener('blur', (e) => {
+        e.target.parentElement.classList.remove('focus')
+    });
 };
 
 form.addEventListener('submit', (e) => {
-    e.preventDefault();
     
-    if (!nameValidator()) {
+    if (!basicInfoValidator()) {
         e.preventDefault();
-        //console.log('this name handler works')
-    };
-
-    if (!emailValidator()) {
-        e.preventDefault();
-        //console.log('this email handler works')
-    };
-
-    if (!registerForActivitiesValidator()){
-        e.preventDefault();
-        //console.log('this register handler works');
     };
 
     if(!creditCardValidator()) {
         e.preventDefault();
-        console.log('this credit card handler works');
     };
-
 });
 
