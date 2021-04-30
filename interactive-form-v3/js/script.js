@@ -112,9 +112,9 @@ paymentMethod.addEventListener('change', (e) => {
 //This listener will save the chose activities in an array. 
 activitiesBox.addEventListener('change', e => {
     if (e.target.checked) {
-        activitiesChecked.push(e.target.getAttribute('data-day-and-time'))
+        activitiesChecked.push(e.target.getAttribute('data-day-and-time'));
     } else {
-        activitiesChecked.pop(e.target.getAttribute('data-day-and-time'))
+        activitiesChecked.pop(e.target.getAttribute('data-day-and-time'));
     };   
 });
 
@@ -226,14 +226,14 @@ emailAddress.addEventListener('keyup', e => {
     const emailHint = document.querySelector('#email-hint');
 
     if (emailAddress.value.includes('@')) {
-        emailHint.innerHTML = 'You are almost there.'
+        emailHint.innerHTML = 'You are almost there.';
     };
 
     if (!testEmail) {
         validationFail(emailAddress);
         e.preventDefault();
     } else {
-        validationPass(emailAddress)
+        validationPass(emailAddress);
     };   
 });
 
