@@ -1,6 +1,7 @@
-//FORM SECTION
+//FORM SECTION VARIABLE
 const form = document.querySelector('form')
-//BASIC INFO SECTION
+
+//BASIC INFO SECTION VARIABLES
 const userName = document.querySelector('#name');
 const emailAddress = document.querySelector('#email');
 const design = document.querySelector('#design');
@@ -9,15 +10,16 @@ const jobRole = document.querySelector('#title');
 const otherJobRole = document.querySelector('#other-job-role');
 const size = document.querySelector('#size');
 
-//REGISTER FOR ACTIVITIES SECTION
+//REGISTER FOR ACTIVITIES SECTION VARIABLES
 const registerForActivities = document.querySelector('#activities');
 const paragraphVar = document.querySelector('#activities-cost');
 const activitiesBox = document.querySelector('#activities-box');
 const buttons = activitiesBox.querySelectorAll('input');
 let totalCost = 0;
 let languageTotal = 0;
+let activitiesChecked = [];
 
-//PAYMENT INFO SECTION
+//PAYMENT INFO SECTION VARIABLES
 const paymentMethod = document.querySelector('#payment');
 const cardNumber = document.querySelector('#cc-num');
 const creditCard = document.querySelector('#credit-card');
@@ -28,9 +30,18 @@ const cvv = document.querySelector('#cvv');
 const expirationDate = document.querySelector('#exp-month');
 const expirationYear = document.querySelector('#exp-year')
 
-//userName.focus();
-otherJobRole.style.display = 'none';
+//This method will focus our name field at open the page.
+userName.focus();
 
+//This styles will hide our paypal and bitcoin fields for deffault at open the page.
+paypal.style.display = 'none';
+bitcoin.style.display = 'none';
+
+//This method will set up our Credit Card option by deffault in our payment method field.
+paymentMethod[1].setAttribute('selected', '');
+
+//This listener will open the field to add other job role.
+otherJobRole.style.display = 'none';
 jobRole.addEventListener('change', (e) => {
     if (e.target.value === 'other') {
         otherJobRole.style.display = 'block';
@@ -39,8 +50,8 @@ jobRole.addEventListener('change', (e) => {
     };
 });
 
+//This listener will disabled our color field if we don't have select any design theme.
 color.disabled = true;
-
 design.addEventListener('change', (e) => {
     color.disabled = false;
 
@@ -58,6 +69,7 @@ design.addEventListener('change', (e) => {
     };
 });
 
+//This listener will add the price at total when we select the activities.
 registerForActivities.addEventListener('change', (e) => {
     const dataCost = +e.target.getAttribute('data-cost');
     (e.target.checked) ? languageTotal++ : languageTotal--;
@@ -72,11 +84,7 @@ registerForActivities.addEventListener('change', (e) => {
     paragraphVar.innerHTML = `Total: $${totalCost}`;
 });
 
-paypal.style.display = 'none';
-bitcoin.style.display = 'none';
-
-paymentMethod[1].setAttribute('selected', '');
-
+//This listener will switch between our differents payment methods.
 paymentMethod.addEventListener('change', (e) => {
     
     switch (e.target.value) {
@@ -101,22 +109,35 @@ paymentMethod.addEventListener('change', (e) => {
     };
 });
 
+//This listener will save the chose activities in an array. 
+activitiesBox.addEventListener('change', e => {
+    if (e.target.checked) {
+        activitiesChecked.push(e.target.getAttribute('data-day-and-time'))
+    } else {
+        activitiesChecked.pop(e.target.getAttribute('data-day-and-time'))
+    };   
+});
+
+//This will be a helper function that we use to add hints to ours fields.
 const validationPass = (element) => {
     element.parentElement.className = 'valid';
     element.parentElement.classList.remove('not-valid');
     element.parentElement.lastElementChild.style.display = 'none';
 };
-  
+
+//This will be a helper function that we use to add hints to ours fields.
 const validationFail = (element) => {
     element.parentElement.className = 'not-valid';
     element.parentElement.classList.remove('valid');
     element.parentElement.lastElementChild.style.display = 'block';
 };
 
+//This will be a helper function that we use to add hints to ours fields.
 const expressValidator = (val1, val2) => {
     (val1.value != val2) ? val1.parentElement.className = 'valid' : val1.parentElement.className = 'not-valid';
 };
 
+//This function validate all the fields of the first section of our page. (Basic Info, T-Shirt info and Register for Activities).
 function firstSectionValidator() {
     const testName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(userName.value);
     const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
@@ -151,6 +172,7 @@ function firstSectionValidator() {
     };
 };
 
+//This function validates only the Paymenth Info section fields.
 function secondSectionValidator() {
     if (paymentMethod.value === 'credit-card') {
         const testCreditCard = /^\d{13,16}$/.test(cardNumber.value);
@@ -186,6 +208,7 @@ function secondSectionValidator() {
     };
 };
 
+//This loop add the focus listener to our Register For Activities fields.
 for (let i = 0; i < buttons.length; i++) {
 
     buttons[i].addEventListener('focus', (e) => {
@@ -197,12 +220,13 @@ for (let i = 0; i < buttons.length; i++) {
     });
 };
 
+//This listener validates the email field input in real time.
 emailAddress.addEventListener('keyup', e => {
     const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
     const emailHint = document.querySelector('#email-hint');
 
     if (emailAddress.value.includes('@')) {
-        emailHint.innerHTML = 'You are almost there'
+        emailHint.innerHTML = 'You are almost there.'
     };
 
     if (!testEmail) {
@@ -213,6 +237,7 @@ emailAddress.addEventListener('keyup', e => {
     };   
 });
 
+//This listener will submit our form if all the fields are correct and there is not two activities at the same day and time.
 form.addEventListener('submit', (e) => {
     
     if (!firstSectionValidator()) {
@@ -221,6 +246,16 @@ form.addEventListener('submit', (e) => {
 
     if(!secondSectionValidator()) {
         e.preventDefault();
+    };
+
+    for(let i = 0; i < activitiesChecked.length; i++) {
+        for (let j = 1; j < activitiesChecked.length; j++) {
+            if (activitiesChecked[i] == activitiesChecked[j]) {
+                validationFail(activitiesBox);
+                registerForActivities.lastElementChild.innerHTML = "You can't select two activities at the same day and time";
+                e.preventDefault();
+            };
+        };
     };
 });
 
