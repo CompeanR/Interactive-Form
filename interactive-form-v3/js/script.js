@@ -250,7 +250,8 @@ form.addEventListener('submit', (e) => {
 
     for(let i = 0; i < activitiesChecked.length; i++) {
         for (let j = 1; j < activitiesChecked.length; j++) {
-            if (activitiesChecked[i] == activitiesChecked[j]) {
+            
+            if (activitiesChecked[i] == activitiesChecked[j+i]) {
                 validationFail(activitiesBox);
                 registerForActivities.lastElementChild.innerHTML = "You can't select two activities at the same day and time";
                 e.preventDefault();
