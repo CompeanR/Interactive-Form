@@ -7,6 +7,7 @@ const design = document.querySelector('#design');
 const color = document.querySelector('#color');
 const jobRole = document.querySelector('#title');
 const otherJobRole = document.querySelector('#other-job-role');
+const size = document.querySelector('#size');
 
 //REGISTER FOR ACTIVITIES SECTION
 const registerForActivities = document.querySelector('#activities');
@@ -24,8 +25,10 @@ const paypal = document.querySelector('#paypal');
 const bitcoin = document.querySelector('#bitcoin');
 const zipCode = document.querySelector('#zip');
 const cvv = document.querySelector('#cvv');
+const expirationDate = document.querySelector('#exp-month');
+const expirationYear = document.querySelector('#exp-year')
 
-userName.focus();
+//userName.focus();
 otherJobRole.style.display = 'none';
 
 jobRole.addEventListener('change', (e) => {
@@ -63,7 +66,7 @@ registerForActivities.addEventListener('change', (e) => {
         totalCost += dataCost;
     } else {
         totalCost -= dataCost;
-        e.target.parentElement.classList.remove('focus')
+        e.target.parentElement.classList.remove('focus');
     };
 
     paragraphVar.innerHTML = `Total: $${totalCost}`;
@@ -110,15 +113,29 @@ const validationFail = (element) => {
     element.parentElement.lastElementChild.style.display = 'block';
 };
 
-function basicInfoValidator() {
+const expressValidator = (val1, val2) => {
+    (val1.value != val2) ? val1.parentElement.className = 'valid' : val1.parentElement.className = 'not-valid';
+};
+
+function firstSectionValidator() {
     const testName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(userName.value);
     const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
     const validLanguage = languageTotal > 0;
+    size.parentElement.className = 'valid';
+
+    expressValidator(design, 'Select Theme');
+    expressValidator(color, 'Select a design theme above');
 
     if (testName) {
         validationPass(userName);
     } else {
         validationFail(userName);
+    };
+
+    if (validLanguage) {
+        validationPass(activitiesBox);
+    } else {
+        validationFail(activitiesBox);
     };
 
     if (testEmail) {
@@ -134,34 +151,37 @@ function basicInfoValidator() {
     };
 };
 
-function creditCardValidator() {
+function secondSectionValidator() {
     if (paymentMethod.value === 'credit-card') {
         const testCreditCard = /^\d{13,16}$/.test(cardNumber.value);
         const testZipCode = /^\d{5}$/.test(zipCode.value);
         const testCvv = /^\d{3}$/.test(cvv.value);
+
+        expressValidator(expirationDate, 'Select Date');
+        expressValidator(expirationYear, 'Select Year');
     
         if (testCreditCard) {
             validationPass(cardNumber);
         } else {
-            validationFail(cardNumber)
+            validationFail(cardNumber);
         };
 
         if (testZipCode) {
             validationPass(zipCode);
         } else {
-            validationFail(zipCode)
+            validationFail(zipCode);
         };
 
         if (testCvv) {
             validationPass(cvv);
         } else {
-            validationFail(cvv)
+            validationFail(cvv);
         };
 
         if (testCreditCard && testZipCode && testCvv) {
-            return true
+            return true;
         } else {
-            return false
+            return false;
         };
     };
 };
@@ -169,21 +189,37 @@ function creditCardValidator() {
 for (let i = 0; i < buttons.length; i++) {
 
     buttons[i].addEventListener('focus', (e) => {
-        e.target.parentElement.className = 'focus'
+        e.target.parentElement.className = 'focus';
     });
 
     buttons[i].addEventListener('blur', (e) => {
-        e.target.parentElement.classList.remove('focus')
+        e.target.parentElement.classList.remove('focus');
     });
 };
 
+emailAddress.addEventListener('keyup', e => {
+    const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
+    const emailHint = document.querySelector('#email-hint');
+
+    if (emailAddress.value.includes('@')) {
+        emailHint.innerHTML = 'You are almost there'
+    };
+
+    if (!testEmail) {
+        validationFail(emailAddress);
+        e.preventDefault();
+    } else {
+        validationPass(emailAddress)
+    };   
+});
+
 form.addEventListener('submit', (e) => {
     
-    if (!basicInfoValidator()) {
+    if (!firstSectionValidator()) {
         e.preventDefault();
     };
 
-    if(!creditCardValidator()) {
+    if(!secondSectionValidator()) {
         e.preventDefault();
     };
 });
