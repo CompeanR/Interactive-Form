@@ -17,7 +17,6 @@ const activitiesBox = document.querySelector('#activities-box');
 const buttons = activitiesBox.querySelectorAll('input');
 let totalCost = 0;
 let languageTotal = 0;
-let activitiesChecked = [];
 
 //PAYMENT INFO SECTION VARIABLES
 const paymentMethod = document.querySelector('#payment');
@@ -33,11 +32,11 @@ const expirationYear = document.querySelector('#exp-year')
 //This method will focus our name field at open the page.
 userName.focus();
 
-//This styles will hide our paypal and bitcoin fields for deffault at open the page.
+//This styles will hide our paypal and bitcoin fields for default at open the page.
 paypal.style.display = 'none';
 bitcoin.style.display = 'none';
 
-//This method will set up our Credit Card option by deffault in our payment method field.
+//This method will set up our Credit Card option by default in our payment method field.
 paymentMethod[1].setAttribute('selected', '');
 
 //This listener will open the field to add other job role.
@@ -62,15 +61,21 @@ design.addEventListener('change', (e) => {
         if (designColor == currentColor) {
             color[i].hidden = false;
             e.target.setAttribute('selected', true);
+            color[i].setAttribute('selected', '');
         } else {
             color[i].hidden = true;
             e.target.setAttribute('selected', false);
+        };
+
+        if (color[i].hidden) {
+            color[i].removeAttribute('selected', '');
         };
     };
 });
 
 //This listener will add the price at total when we select the activities.
 registerForActivities.addEventListener('change', (e) => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     const dataCost = +e.target.getAttribute('data-cost');
     (e.target.checked) ? languageTotal++ : languageTotal--;
     
@@ -82,9 +87,19 @@ registerForActivities.addEventListener('change', (e) => {
     };
 
     paragraphVar.innerHTML = `Total: $${totalCost}`;
+
+    for (let i = 0; i < checkboxes.length; i++) {
+        const checkbox = checkboxes[i];
+        const activityTime = checkbox.getAttribute('data-day-and-time');
+
+        if (activityTime === e.target.getAttribute('data-day-and-time') && e.target !== checkbox) {
+            e.target.checked
+                ?(checkbox.disabled = true) : (checkbox.disabled = false);
+        };
+    };
 });
 
-//This listener will switch between our differents payment methods.
+//This listener will switch between our different payment methods.
 paymentMethod.addEventListener('change', (e) => {
     
     switch (e.target.value) {
@@ -107,15 +122,6 @@ paymentMethod.addEventListener('change', (e) => {
             paypal.style.display = 'none';
             bitcoin.style.display = 'none';
     };
-});
-
-//This listener will save the chose activities in an array. 
-activitiesBox.addEventListener('change', e => {
-    if (e.target.checked) {
-        activitiesChecked.push(e.target.getAttribute('data-day-and-time'));
-    } else {
-        activitiesChecked.pop(e.target.getAttribute('data-day-and-time'));
-    };   
 });
 
 //This will be a helper function that we use to add hints to ours fields.
@@ -154,9 +160,11 @@ function firstSectionValidator() {
     };
 
     if (validLanguage) {
-        validationPass(activitiesBox);
+        registerForActivities.children[0].className = 'valid'
+        activitiesBox.parentElement.lastElementChild.style.display = 'none';
     } else {
-        validationFail(activitiesBox);
+        registerForActivities.children[0].className = 'not-valid'
+        activitiesBox.parentElement.lastElementChild.style.display = 'block';
     };
 
     if (testEmail) {
@@ -172,7 +180,7 @@ function firstSectionValidator() {
     };
 };
 
-//This function validates only the Paymenth Info section fields.
+//This function validates only the Payments Info section fields.
 function secondSectionValidator() {
     if (paymentMethod.value === 'credit-card') {
         const testCreditCard = /^\d{13,16}$/.test(cardNumber.value);
@@ -225,8 +233,8 @@ emailAddress.addEventListener('keyup', e => {
     const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
     const emailHint = document.querySelector('#email-hint');
 
-    if (emailAddress.value.includes('@')) {
-        emailHint.innerHTML = 'You are almost there.';
+    if (!emailAddress.value.includes('@') && emailAddress.value.length > 10) {
+        emailHint.innerHTML = 'Enter a valid email address with @ format.';
     };
 
     if (!testEmail) {
@@ -246,17 +254,6 @@ form.addEventListener('submit', (e) => {
 
     if(!secondSectionValidator()) {
         e.preventDefault();
-    };
-
-    for(let i = 0; i < activitiesChecked.length; i++) {
-        for (let j = 1; j < activitiesChecked.length; j++) {
-            
-            if (activitiesChecked[i] == activitiesChecked[j+i]) {
-                validationFail(activitiesBox);
-                registerForActivities.lastElementChild.innerHTML = "You can't select two activities at the same day and time";
-                e.preventDefault();
-            };
-        };
     };
 });
 
