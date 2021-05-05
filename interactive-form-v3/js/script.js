@@ -39,6 +39,35 @@ bitcoin.style.display = 'none';
 //This method will set up our Credit Card option by default in our payment method field.
 paymentMethod[1].setAttribute('selected', '');
 
+//This loop add the focus listener to our Register For Activities fields.
+for (let i = 0; i < buttons.length; i++) {
+
+    buttons[i].addEventListener('focus', (e) => {
+        e.target.parentElement.className = 'focus';
+    });
+
+    buttons[i].addEventListener('blur', (e) => {
+        e.target.parentElement.classList.remove('focus');
+    });
+};
+
+//This listener validates the email field input in real time.
+emailAddress.addEventListener('keyup', e => {
+    const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
+    const emailHint = document.querySelector('#email-hint');
+
+    if (!emailAddress.value.includes('@') && emailAddress.value.length > 10) {
+        emailHint.innerHTML = 'Enter a valid email address with @ format.';
+    };
+
+    if (!testEmail) {
+        validationFail(emailAddress);
+        e.preventDefault();
+    } else {
+        validationPass(emailAddress);
+    };   
+});
+
 //This listener will open the field to add other job role.
 otherJobRole.style.display = 'none';
 jobRole.addEventListener('change', (e) => {
@@ -93,8 +122,7 @@ registerForActivities.addEventListener('change', (e) => {
         const activityTime = checkbox.getAttribute('data-day-and-time');
 
         if (activityTime === e.target.getAttribute('data-day-and-time') && e.target !== checkbox) {
-            e.target.checked
-                ?(checkbox.disabled = true) : (checkbox.disabled = false);
+            e.target.checked ? (checkbox.disabled = true) : (checkbox.disabled = false);
         };
     };
 });
@@ -216,35 +244,6 @@ function secondSectionValidator() {
     };
 };
 
-//This loop add the focus listener to our Register For Activities fields.
-for (let i = 0; i < buttons.length; i++) {
-
-    buttons[i].addEventListener('focus', (e) => {
-        e.target.parentElement.className = 'focus';
-    });
-
-    buttons[i].addEventListener('blur', (e) => {
-        e.target.parentElement.classList.remove('focus');
-    });
-};
-
-//This listener validates the email field input in real time.
-emailAddress.addEventListener('keyup', e => {
-    const testEmail = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailAddress.value);
-    const emailHint = document.querySelector('#email-hint');
-
-    if (!emailAddress.value.includes('@') && emailAddress.value.length > 10) {
-        emailHint.innerHTML = 'Enter a valid email address with @ format.';
-    };
-
-    if (!testEmail) {
-        validationFail(emailAddress);
-        e.preventDefault();
-    } else {
-        validationPass(emailAddress);
-    };   
-});
-
 //This listener will submit our form if all the fields are correct and there is not two activities at the same day and time.
 form.addEventListener('submit', (e) => {
     
@@ -252,8 +251,10 @@ form.addEventListener('submit', (e) => {
         e.preventDefault();
     };
 
-    if(!secondSectionValidator()) {
-        e.preventDefault();
+    if (paymentMethod.value == 'credit-card') {
+        if(!secondSectionValidator()) {
+            e.preventDefault();
+        };
     };
 });
 
