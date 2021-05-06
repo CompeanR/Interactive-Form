@@ -42,11 +42,11 @@ This is a interactive form that can be useful to ecommerce web pages.
 
 #### Real-time Error Validations
 
-    I'm adding this feature to the email address field, when the user start typing in the field it will appear an error message until enter a valid email address.
+- I'm added this feature to the email address field, when the user start typing in the field it will appear an error message until enter a valid email address.
 
 #### Conditional Error Message
 
-    I'm adding this feature to the email address field, when the user enter a invalid domain an error will appear.
+- I'm added this feature to the email address field, when the user enter a domain without @ an error will appear, indicating that the domain should have @.
 
 
 ## Author Info
