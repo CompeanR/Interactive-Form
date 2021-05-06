@@ -40,6 +40,14 @@ This is a interactive form that can be useful to ecommerce web pages.
 
     This listener validates the email field input in real time.
 
+#### Real-time Error Validations
+
+    I'm adding this feature to the email address field, when the user start typing in the field it will appear an error message until enter a valid email address.
+
+#### Conditional Error Message
+
+    I'm adding this feature to the email address field, when the user enter a invalid domain an error will appear.
+
 
 ## Author Info
 
